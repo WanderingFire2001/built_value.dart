@@ -297,6 +297,14 @@ abstract class ValueSourceClass
       element.library.definingCompilationUnit;
 
   static bool needsBuiltValue(ClassElement classElement) {
+    // RTborg
+    bool optOut = classElement.metadata
+                .map((annotation) => annotation.computeConstantValue())
+                .any(
+                    (value) => DartTypes.getName(value?.type) == 'NotBuiltValue');
+    if (optOut) {
+        return false;
+    }
     // TODO(davidmorgan): more exact type check.
     return !classElement.displayName.startsWith('_\$') &&
         (classElement.allSupertypes.any(
